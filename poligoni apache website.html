@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poligoni Apache — Poligon Qitjeje</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #1c1f17;
+    --panel: #262b1f;
+    --panel-2: #2e3324;
+    --cream: #d9d4bf;
+    --bone: #ece8da;
+    --sage: #8a8d6e;
+    --rust: #c1481f;
+    --rust-dim: #8a3416;
+    --line: rgba(217,212,191,0.12);
+    --line-strong: rgba(217,212,191,0.25);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background: var(--bg);
+    color: var(--bone);
+    font-family:'Inter', sans-serif;
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
+  }
+
+  h1,h2,h3,h4{
+    font-family:'Oswald', sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    font-weight:600;
+    color: var(--bone);
+  }
+
+  .mono{
+    font-family:'Space Mono', monospace;
+  }
+
+  a{color:inherit;}
+
+  .container{
+    max-width:1180px;
+    margin:0 auto;
+    padding:0 28px;
+  }
+
+  /* ===== Background texture ===== */
+  .grain{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:2;
+    opacity:0.05;
+    mix-blend-mode:overlay;
+    background-image:
+      radial-gradient(circle at 20% 30%, #fff 0%, transparent 0.6%),
+      radial-gradient(circle at 80% 60%, #fff 0%, transparent 0.5%),
+      radial-gradient(circle at 50% 90%, #fff 0%, transparent 0.7%);
+    background-size: 180px 180px, 240px 240px, 200px 200px;
+  }
+
+  /* ===== Header ===== */
+  header{
+    position:fixed;
+    top:0; left:0; right:0;
+    z-index:100;
+    background:rgba(28,31,23,0.88);
+    backdrop-filter: blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+
+  .nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:14px 28px;
+    max-width:1180px;
+    margin:0 auto;
+  }
+
+  .nav-brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+
+  .nav-brand img{
+    width:42px; height:42px;
+    border-radius:50%;
+    border:1px solid var(--line-strong);
+  }
+
+  .nav-brand-text{
+    font-family:'Oswald', sans-serif;
+    font-size:17px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    line-height:1.1;
+  }
+  .nav-brand-text span{
+    display:block;
+    font-size:10px;
+    color: var(--sage);
+    letter-spacing:0.25em;
+    font-weight:400;
+    margin-top:3px;
+  }
+
+  .nav-links{
+    display:flex;
+    gap:32px;
+    list-style:none;
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    font-weight:500;
+  }
+  .nav-links a{
+    text-decoration:none;
+    color: var(--cream);
+    position:relative;
+    padding-bottom:4px;
+    transition:color 0.2s;
+  }
+  .nav-links a:hover{ color: var(--rust); }
+  .nav-links a:focus-visible{ outline:2px solid var(--rust); outline-offset:4px; }
+
+  .nav-cta{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background: var(--rust);
+    color: var(--bg);
+    font-family:'Oswald', sans-serif;
+    font-size:13px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    font-weight:600;
+    padding:11px 22px;
+    border-radius:2px;
+    text-decoration:none;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .nav-cta:hover{ background:#d6541f; transform:translateY(-1px); }
+
+  .menu-toggle{ display:none; }
+
+  /* ===== Hero ===== */
+  .hero{
+    position:relative;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    padding-top:90px;
+    overflow:hidden;
+  }
+
+  .hero::before{
+    content:"";
+    position:absolute;
+    top:50%; left:50%;
+    width:1400px; height:1400px;
+    transform:translate(-50%,-50%);
+    background:
+      repeating-radial-gradient(circle, transparent 0 78px, var(--line) 79px 80px),
+      transparent;
+    opacity:0.5;
+    z-index:0;
+  }
+
+  .hero-grid{
+    position:relative;
+    z-index:1;
+    display:grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap:60px;
+    align-items:center;
+    width:100%;
+  }
+
+  .hero-eyebrow{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.3em;
+    color: var(--rust);
+    text-transform:uppercase;
+    margin-bottom:22px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .hero-eyebrow::before{
+    content:"";
+    width:36px; height:1px;
+    background: var(--rust);
+  }
+
+  .hero h1{
+    font-size:clamp(48px, 8vw, 92px);
+    line-height:0.98;
+    letter-spacing:0.01em;
+    margin-bottom:24px;
+  }
+  .hero h1 em{
+    font-style:normal;
+    color: var(--rust);
+    display:block;
+  }
+
+  .hero p.lead{
+    font-size:18px;
+    color: var(--cream);
+    max-width:480px;
+    margin-bottom:36px;
+  }
+
+  .hero-actions{
+    display:flex;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+
+  .btn{
+    font-family:'Oswald', sans-serif;
+    font-size:14px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    font-weight:600;
+    padding:16px 30px;
+    border-radius:2px;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    transition: all 0.2s;
+    border:1px solid transparent;
+  }
+  .btn-primary{
+    background: var(--rust);
+    color: var(--bg);
+  }
+  .btn-primary:hover{ background:#d6541f; transform:translateY(-2px); }
+  .btn-outline{
+    border-color: var(--line-strong);
+    color: var(--bone);
+  }
+  .btn-outline:hover{ border-color: var(--rust); color: var(--rust); }
+
+  /* ===== Hero target graphic ===== */
+  .hero-visual{
+    position:relative;
+    aspect-ratio:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .target-svg{
+    width:100%;
+    max-width:420px;
+    height:auto;
+  }
+
+  .target-svg .ring{
+    fill:none;
+    stroke: var(--line-strong);
+    stroke-width:1;
+  }
+  .target-svg .ring-accent{
+    stroke: var(--rust);
+    stroke-width:1.5;
+    stroke-dasharray:4 6;
+    animation: spin 60s linear infinite;
+    transform-origin:center;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .target-svg .crosshair{
+    stroke: var(--cream);
+    stroke-width:1;
+    opacity:0.5;
+  }
+
+  .target-svg .hit{
+    fill: var(--rust);
+  }
+
+  .target-logo{
+    position:absolute;
+    width:130px; height:130px;
+    border-radius:50%;
+    border:2px solid var(--rust);
+    box-shadow: 0 0 0 8px var(--bg), 0 0 40px rgba(193,72,31,0.25);
+  }
+  .target-logo img{
+    width:100%; height:100%;
+    border-radius:50%;
+    display:block;
+  }
+
+  .hero-stats{
+    position:relative;
+    z-index:1;
+    display:flex;
+    gap:48px;
+    margin-top:64px;
+    padding-top:32px;
+    border-top:1px solid var(--line);
+  }
+  .stat .num{
+    font-family:'Oswald', sans-serif;
+    font-size:34px;
+    color: var(--bone);
+    letter-spacing:0;
+  }
+  .stat .label{
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.15em;
+    text-transform:uppercase;
+    color: var(--sage);
+    margin-top:4px;
+  }
+
+  /* ===== Section heading pattern ===== */
+  .section{
+    padding:110px 0;
+    position:relative;
+  }
+  .section-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:40px;
+    margin-bottom:64px;
+    flex-wrap:wrap;
+  }
+  .section-tag{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.3em;
+    text-transform:uppercase;
+    color: var(--rust);
+    margin-bottom:14px;
+    display:block;
+  }
+  .section-head h2{
+    font-size:clamp(32px, 5vw, 52px);
+    line-height:1.05;
+    max-width:560px;
+  }
+  .section-head p{
+    color: var(--sage);
+    max-width:360px;
+    font-size:15px;
+  }
+
+  /* ===== Caliber/range section ===== */
+  .caliber-strip{
+    background: var(--panel);
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+
+  .caliber-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:0;
+  }
+  .caliber-card{
+    padding:48px 40px;
+    border-right:1px solid var(--line);
+    position:relative;
+    transition: background 0.3s;
+  }
+  .caliber-card:last-child{ border-right:none; }
+  .caliber-card:hover{ background: var(--panel-2); }
+
+  .caliber-card .index{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    color: var(--sage);
+    letter-spacing:0.2em;
+    margin-bottom:28px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+
+  .caliber-card svg{
+    width:100%;
+    height:64px;
+    margin-bottom:28px;
+    stroke: var(--cream);
+    fill:none;
+    stroke-width:1.5;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+  }
+  .caliber-card:hover svg{ stroke: var(--rust); transition:stroke 0.3s; }
+
+  .caliber-card h3{
+    font-size:24px;
+    margin-bottom:10px;
+  }
+  .caliber-card .sub{
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.15em;
+    text-transform:uppercase;
+    color: var(--sage);
+    margin-bottom:18px;
+  }
+  .caliber-card p{
+    font-size:14px;
+    color: var(--cream);
+    margin-bottom:22px;
+  }
+  .caliber-card ul{
+    list-style:none;
+    font-size:13px;
+    font-family:'Space Mono', monospace;
+    color: var(--bone);
+  }
+  .caliber-card li{
+    padding:8px 0;
+    border-top:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+  }
+  .caliber-card li:first-child{ border-top:none; }
+  .caliber-card li span:last-child{ color: var(--rust); }
+
+  /* ===== Licensing section ===== */
+  .license-section{
+    padding:110px 0;
+  }
+  .license-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:80px;
+    align-items:start;
+  }
+
+  .license-doc{
+    background: var(--panel);
+    border:1px solid var(--line-strong);
+    padding:44px;
+    position:relative;
+  }
+  .license-doc::before{
+    content:"";
+    position:absolute;
+    top:16px; right:16px;
+    width:64px; height:64px;
+    border:1px dashed var(--rust);
+    border-radius:50%;
+    opacity:0.5;
+  }
+  .license-doc::after{
+    content:"APROVUAR";
+    position:absolute;
+    top:36px; right:24px;
+    width:48px;
+    font-family:'Space Mono', monospace;
+    font-size:8px;
+    letter-spacing:0.1em;
+    color: var(--rust);
+    text-align:center;
+    transform:rotate(15deg);
+    opacity:0.7;
+  }
+  .license-doc h3{
+    font-size:22px;
+    margin-bottom:8px;
+  }
+  .license-doc .sub{
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.15em;
+    color: var(--sage);
+    text-transform:uppercase;
+    margin-bottom:24px;
+  }
+  .license-doc ol{
+    list-style:none;
+    counter-reset:step;
+  }
+  .license-doc ol li{
+    counter-increment:step;
+    padding:14px 0;
+    border-top:1px solid var(--line);
+    display:flex;
+    gap:18px;
+    font-size:14px;
+    color: var(--cream);
+  }
+  .license-doc ol li:first-child{ border-top:none; }
+  .license-doc ol li::before{
+    content: counter(step, decimal-leading-zero);
+    font-family:'Space Mono', monospace;
+    color: var(--rust);
+    font-size:13px;
+    flex-shrink:0;
+  }
+
+  .license-text h2{
+    font-size:clamp(32px, 5vw, 48px);
+    margin-bottom:24px;
+    line-height:1.1;
+  }
+  .license-text p{
+    color: var(--cream);
+    margin-bottom:20px;
+    font-size:15px;
+    max-width:460px;
+  }
+  .license-tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:32px;
+  }
+  .license-tags span{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.08em;
+    border:1px solid var(--line-strong);
+    padding:8px 16px;
+    border-radius:2px;
+    color: var(--sage);
+  }
+
+  /* ===== Process / how it works ===== */
+  .process{
+    background: var(--panel);
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+  .process-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:1px;
+    background: var(--line);
+  }
+  .process-step{
+    background: var(--panel);
+    padding:40px 32px;
+    position:relative;
+  }
+  .process-step .step-num{
+    font-family:'Oswald', sans-serif;
+    font-size:48px;
+    color: transparent;
+    -webkit-text-stroke:1px var(--line-strong);
+    margin-bottom:24px;
+    line-height:1;
+  }
+  .process-step h4{
+    font-size:17px;
+    margin-bottom:10px;
+  }
+  .process-step p{
+    font-size:13px;
+    color: var(--cream);
+  }
+
+  /* ===== Membership / pricing ===== */
+  .pricing-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:24px;
+  }
+  .price-card{
+    border:1px solid var(--line-strong);
+    padding:40px 36px;
+    position:relative;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .price-card:hover{ transform:translateY(-4px); border-color: var(--rust); }
+  .price-card.featured{
+    background: var(--panel);
+    border-color: var(--rust);
+  }
+  .price-card .tag{
+    position:absolute;
+    top:0; right:0;
+    background: var(--rust);
+    color: var(--bg);
+    font-family:'Space Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.15em;
+    text-transform:uppercase;
+    padding:6px 14px;
+  }
+  .price-card h3{
+    font-size:20px;
+    margin-bottom:6px;
+  }
+  .price-card .price{
+    font-family:'Oswald', sans-serif;
+    font-size:42px;
+    color: var(--bone);
+    margin:18px 0 6px;
+  }
+  .price-card .price span{
+    font-size:14px;
+    color: var(--sage);
+    font-family:'Space Mono', monospace;
+    text-transform:none;
+    letter-spacing:0;
+  }
+  .price-card ul{
+    list-style:none;
+    margin-top:28px;
+    font-size:14px;
+    color: var(--cream);
+  }
+  .price-card li{
+    padding:10px 0;
+    border-top:1px solid var(--line);
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+  }
+  .price-card li:first-child{ border-top:none; }
+  .price-card li::before{
+    content:"";
+    width:6px; height:6px;
+    background: var(--rust);
+    margin-top:7px;
+    flex-shrink:0;
+    transform:rotate(45deg);
+  }
+
+  /* ===== Rules/safety strip ===== */
+  .rules{
+    padding:90px 0;
+  }
+  .rules-grid{
+    display:grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap:60px;
+    align-items:center;
+  }
+  .rules-list{
+    display:flex;
+    flex-direction:column;
+    gap:0;
+  }
+  .rule-item{
+    display:flex;
+    gap:24px;
+    padding:22px 0;
+    border-top:1px solid var(--line);
+    align-items:flex-start;
+  }
+  .rule-item:first-child{ border-top:none; }
+  .rule-item .ico{
+    flex-shrink:0;
+    width:40px; height:40px;
+    border:1px solid var(--line-strong);
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .rule-item .ico svg{
+    width:18px; height:18px;
+    stroke: var(--rust);
+    fill:none;
+    stroke-width:2;
+  }
+  .rule-item h4{ font-size:16px; margin-bottom:4px; }
+  .rule-item p{ font-size:13px; color: var(--sage); }
+
+  .rules-visual{
+    background: var(--panel);
+    border:1px solid var(--line);
+    aspect-ratio:4/5;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .rules-visual svg{ width:80%; }
+
+  /* ===== CTA / Contact ===== */
+  .cta-band{
+    background: var(--panel-2);
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    padding:90px 0;
+    text-align:center;
+  }
+  .cta-band h2{
+    font-size:clamp(32px,6vw,58px);
+    margin-bottom:18px;
+  }
+  .cta-band p{
+    color: var(--cream);
+    max-width:480px;
+    margin:0 auto 36px;
+  }
+  .cta-band .hero-actions{ justify-content:center; }
+
+  /* ===== Contact ===== */
+  .contact-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:80px;
+  }
+  .contact-info h2{
+    font-size:clamp(30px,5vw,44px);
+    margin-bottom:24px;
+  }
+  .contact-info p{ color: var(--cream); margin-bottom:32px; max-width:420px; }
+  .contact-rows{
+    display:flex;
+    flex-direction:column;
+  }
+  .contact-row{
+    padding:20px 0;
+    border-top:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+  }
+  .contact-row:first-child{ border-top:none; }
+  .contact-row .k{
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color: var(--sage);
+  }
+  .contact-row .v{
+    font-family:'Oswald', sans-serif;
+    font-size:18px;
+    letter-spacing:0.02em;
+  }
+
+  .map-frame{
+    margin-top:36px;
+    border:1px solid var(--line-strong);
+    position:relative;
+    filter: grayscale(0.4) sepia(0.15) brightness(0.85);
+  }
+  .map-frame iframe{ display:block; }
+  .map-link{
+    position:absolute;
+    bottom:14px; right:14px;
+    background: var(--rust);
+    color: var(--bg);
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    text-decoration:none;
+    padding:9px 16px;
+    border-radius:2px;
+    filter: grayscale(0) sepia(0) brightness(1);
+  }
+
+  .contact-form{
+    background: var(--panel);
+    border:1px solid var(--line);
+    padding:44px;
+  }
+  .contact-form h3{ font-size:22px; margin-bottom:6px; }
+  .contact-form .sub{
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.15em;
+    color: var(--sage);
+    text-transform:uppercase;
+    margin-bottom:28px;
+  }
+  .field{ margin-bottom:20px; }
+  .field label{
+    display:block;
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.15em;
+    text-transform:uppercase;
+    color: var(--sage);
+    margin-bottom:8px;
+  }
+  .field input, .field select, .field textarea{
+    width:100%;
+    background: var(--bg);
+    border:1px solid var(--line-strong);
+    color: var(--bone);
+    padding:13px 14px;
+    font-family:'Inter', sans-serif;
+    font-size:14px;
+    border-radius:2px;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    outline:none;
+    border-color: var(--rust);
+  }
+  .field-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+
+  /* ===== Footer ===== */
+  footer{
+    padding:48px 0 32px;
+    border-top:1px solid var(--line);
+  }
+  .footer-grid{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:24px;
+  }
+  .footer-brand{
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .footer-brand img{
+    width:38px; height:38px;
+    border-radius:50%;
+    border:1px solid var(--line-strong);
+  }
+  .footer-brand-text{
+    font-family:'Oswald', sans-serif;
+    font-size:14px;
+    letter-spacing:0.1em;
+  }
+  .footer-brand-text span{
+    display:block;
+    font-size:10px;
+    color: var(--sage);
+    letter-spacing:0.2em;
+    margin-top:2px;
+  }
+  footer .legal{
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    color: var(--sage);
+    letter-spacing:0.05em;
+  }
+  .footer-links{
+    display:flex;
+    gap:28px;
+    list-style:none;
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+  }
+  .footer-links a{ text-decoration:none; color: var(--cream); }
+  .footer-links a:hover{ color: var(--rust); }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 980px){
+    .hero-grid{ grid-template-columns:1fr; gap:40px; }
+    .hero-visual{ max-width:320px; margin:0 auto; }
+    .hero-stats{ flex-wrap:wrap; gap:32px; }
+    .caliber-grid{ grid-template-columns:1fr; }
+    .caliber-card{ border-right:none; border-bottom:1px solid var(--line); }
+    .caliber-card:last-child{ border-bottom:none; }
+    .license-grid{ grid-template-columns:1fr; gap:48px; }
+    .process-grid{ grid-template-columns:1fr 1fr; }
+    .pricing-grid{ grid-template-columns:1fr; }
+    .rules-grid{ grid-template-columns:1fr; }
+    .rules-visual{ order:-1; aspect-ratio:16/10; }
+    .contact-grid{ grid-template-columns:1fr; gap:48px; }
+    .field-row{ grid-template-columns:1fr; }
+    .nav-links{ display:none; }
+  }
+
+  @media (max-width: 560px){
+    .container{ padding:0 20px; }
+    .process-grid{ grid-template-columns:1fr; }
+    .nav-cta{ font-size:11px; padding:9px 16px; }
+    .hero h1{ font-size:14vw; }
+    .footer-grid{ flex-direction:column; align-items:flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <nav class="nav">
+    <div class="nav-brand">
+      <img src="data:image/jpeg;base64,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" alt="Logoja Poligoni Apache">
+      <div class="nav-brand-text">Poligoni Apache<span>Fushë qitje &amp; trajnim</span></div>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#armet">Armët</a></li>
+      <li><a href="#leje">Lejet</a></li>
+      <li><a href="#abone">Çmime</a></li>
+      <li><a href="#rregullat">Rregullat</a></li>
+      <li><a href="#kontakt">Kontakt</a></li>
+    </ul>
+    <a href="#kontakt" class="nav-cta">Rezervo</a>
+  </nav>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="krye">
+  <div class="container hero-grid">
+    <div>
+      <div class="hero-eyebrow">Poligon i Licencuar &mdash; Zonë e Sigurt</div>
+      <h1>QITJE<br>PRECIZE.<br><em>STËRVITJE REALE.</em></h1>
+      <p class="lead">Poligoni Apache ofron korsi qitjeje për pistoleta, karabina dhe armë snajperike, instruktorë të certifikuar dhe ndihmë të plotë për nxjerrjen e leje-ve të armëmbajtjes.</p>
+      <div class="hero-actions">
+        <a href="#kontakt" class="btn btn-primary">Rezervo një korsi</a>
+        <a href="#leje" class="btn btn-outline">Shërbimi i Lejeve</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="num mono">3</div>
+          <div class="label">Korsi qitjeje</div>
+        </div>
+        <div class="stat">
+          <div class="num mono">5m–25m</div>
+          <div class="label">Distanca</div>
+        </div>
+        <div class="stat">
+          <div class="num mono">5/7</div>
+          <div class="label">Hapur çdo ditë</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <svg class="target-svg" viewBox="0 0 420 420" xmlns="http://www.w3.org/2000/svg">
+        <circle class="ring" cx="210" cy="210" r="200"/>
+        <circle class="ring" cx="210" cy="210" r="155"/>
+        <circle class="ring" cx="210" cy="210" r="110"/>
+        <circle class="ring ring-accent" cx="210" cy="210" r="180"/>
+        <line class="crosshair" x1="210" y1="2" x2="210" y2="418"/>
+        <line class="crosshair" x1="2" y1="210" x2="418" y2="210"/>
+        <circle class="hit" cx="265" cy="170" r="4"/>
+        <circle class="hit" cx="180" cy="250" r="4"/>
+        <circle class="hit" cx="232" cy="245" r="4"/>
+        <circle class="hit" cx="195" cy="178" r="4"/>
+        <circle class="hit" cx="248" cy="205" r="4"/>
+      </svg>
+      <div class="target-logo">
+        <img src="data:image/jpeg;base64,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" alt="Poligoni Apache">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ARMËT / CALIBER STRIP ===== -->
+<section class="caliber-strip" id="armet">
+  <div class="container">
+    <div class="section-head" style="padding-top:90px;">
+      <div>
+        <span class="section-tag">Inventari i poligonit</span>
+        <h2>Tri kategori. <br>Çdo nivel përvoje.</h2>
+      </div>
+      <p>Nga trajnimi bazik me pistoleta deri te qitja precize me armë snajperike — me qira ose me armën tënde, sipas licencës përkatëse.</p>
+    </div>
+
+    <div class="caliber-grid">
+      <!-- Pistoleta -->
+      <div class="caliber-card">
+        <div class="index mono"><span>01 / KORSI A</span><span>15–25M</span></div>
+        <svg viewBox="0 0 200 64"><path d="M30 40 L130 40 L130 50 L100 50 L100 28 L150 28 L160 22 L170 28 L160 34 L140 34"/><rect x="100" y="40" width="14" height="18" rx="2"/></svg>
+        <h3>Pistoleta</h3>
+        <div class="sub">9mm · .40 S&amp;W · .45 ACP</div>
+        <p>Korsi të mbyllura për qitje me pistoletë, ideale për fillestarë dhe stërvitje taktike nga afër.</p>
+        <ul>
+          <li><span>Glock 17 (qira)</span><span>9mm</span></li>
+          <li><span>CZ 75 (qira)</span><span>9mm</span></li>
+          <li><span>Armë personale</span><span>Me leje</span></li>
+        </ul>
+      </div>
+
+      <!-- Karabina -->
+      <div class="caliber-card">
+        <div class="index mono"><span>02 / KORSI B</span><span>25–50M</span></div>
+        <svg viewBox="0 0 200 64"><path d="M20 42 L110 42 L120 28 L150 28 L150 36 L165 36 L165 46 L150 46 L150 42 L120 42 L110 56 L20 56 Z"/><line x1="60" y1="42" x2="60" y2="56"/></svg>
+        <h3>Karabina (Rifle)</h3>
+        <div class="sub">.223 / 5.56 · 7.62×39 · .308</div>
+        <p>Korsi gjysmë të hapura për karabina gjysmautomatike dhe stërvitje me distanca të mesme.</p>
+        <ul>
+          <li><span>AR-15 (qira)</span><span>5.56</span></li>
+          <li><span>AK-pattern (qira)</span><span>7.62×39</span></li>
+          <li><span>Armë personale</span><span>Me leje</span></li>
+        </ul>
+      </div>
+
+      <!-- Snajper -->
+      <div class="caliber-card">
+        <div class="index mono"><span>03 / KORSI C</span><span>100M+</span></div>
+        <svg viewBox="0 0 200 64"><path d="M15 44 L150 44 L160 30 L185 30 L185 38 L195 38 L195 48 L185 48 L185 38 L160 50 L15 50 Z"/><circle cx="120" cy="30" r="8" fill="none"/><line x1="120" y1="22" x2="120" y2="38"/><line x1="112" y1="30" x2="128" y2="30"/></svg>
+        <h3>Armë Snajperike</h3>
+        <div class="sub">.308 Win · 6.5 Creedmoor · .338 LM</div>
+        <p>Korsi e hapur, 100m+, me optikë të kalibruar dhe asistencë për pikëtarim dhe vlerësim balistik.</p>
+        <ul>
+          <li><span>Bolt-action .308</span><span>Me instruktor</span></li>
+          <li><span>6.5 Creedmoor</span><span>Me instruktor</span></li>
+          <li><span>Armë personale</span><span>Me leje</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== LEJET / LICENSING ===== -->
+<section class="license-section" id="leje">
+  <div class="container license-grid">
+    <div class="license-text">
+      <span class="section-tag">Shërbim i plotë administrativ</span>
+      <h2>Të ndihmojmë me lejen e armëmbajtjes — nga A te Zh.</h2>
+      <p>Përveç poligonit, Apache ofron mbështetje të plotë për nxjerrjen dhe rinovimin e lejes së armëmbajtjes, duke ju kursyer kohë në çdo hap të procesit administrativ.</p>
+      <p>Stafi ynë juridik dhe instruktorët e certifikuar përgatisin dokumentacionin, organizojnë ekzaminimin mjekësor, kryejnë trajnimin teorik &amp; praktik të detyrueshëm, dhe ju shoqërojnë në dorëzimin e kërkesës.</p>
+      <div class="license-tags">
+        <span>Leje e re</span>
+        <span>Rinovim leje</span>
+        <span>Certifikatë trajnimi</span>
+        <span>Ekzaminim mjekësor</span>
+        <span>Regjistrim arme</span>
+      </div>
+    </div>
+
+    <div class="license-doc">
+      <h3>Procedura e lejes</h3>
+      <div class="sub">Hapat tona standarde</div>
+      <ol>
+        <li>Konsultim fillestar &amp; vlerësim i dokumentacionit personal</li>
+        <li>Organizimi i ekzaminimit mjekësor dhe psikologjik</li>
+        <li>Kursi teorik: ligjet, ruajtja dhe siguria e armëve</li>
+        <li>Trajnimi praktik në poligon me instruktor të certifikuar</li>
+        <li>Plotësimi &amp; dorëzimi i kërkesës pranë autoriteteve</li>
+        <li>Ndjekja e statusit deri në lëshimin e lejes</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PROCESS STRIP ===== -->
+<section class="process">
+  <div class="container" style="padding:0;">
+    <div class="process-grid">
+      <div class="process-step">
+        <div class="step-num">01</div>
+        <h4>Regjistrohu</h4>
+        <p>Plotëso formularin online ose telefono për një takim fillestar pa detyrim.</p>
+      </div>
+      <div class="process-step">
+        <div class="step-num">02</div>
+        <h4>Bisedë &amp; vlerësim</h4>
+        <p>Diskutojmë qëllimin tënd — sport, mbrojtje personale ose certifikim profesional.</p>
+      </div>
+      <div class="process-step">
+        <div class="step-num">03</div>
+        <h4>Trajnim &amp; qitje</h4>
+        <p>Sesione praktike me instruktor në korsinë e duhur, me armët e poligonit ose tëndat.</p>
+      </div>
+      <div class="process-step">
+        <div class="step-num">04</div>
+        <h4>Çertifikim / Leje</h4>
+        <p>Marrja e certifikatës së trajnimit dhe, nëse kërkohet, ndihma për lejen finale.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ÇMIME ===== -->
+<section class="section" id="abone">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="section-tag">Pako &amp; abone</span>
+        <h2>Zgjidh pakon që të përshtatet.</h2>
+      </div>
+      <p>Çmimet përfshijnë qiranë e korsisë; municioni dhe qiraja e armës faturohen veçmas sipas kalibrit.</p>
+    </div>
+
+    <div class="pricing-grid">
+      <div class="price-card">
+        <h3>Seancë e Vetme</h3>
+        <div class="price mono">€15<span> / 30 min</span></div>
+        <ul>
+          <li>1 korsi (A, B ose C)</li>
+          <li>Mbrojtës syri &amp; veshi</li>
+          <li>Hyrje pa pajisje vetjake</li>
+          <li>I përshtatshëm për fillestarë</li>
+        </ul>
+      </div>
+      <div class="price-card featured">
+        <div class="tag">Më i kërkuar</div>
+        <h3>Pako Trajnimi</h3>
+        <div class="price mono">€120<span> / 5 seanca</span></div>
+        <ul>
+          <li>5 seanca me instruktor</li>
+          <li>Pistoletë, karabinë &amp; snajper</li>
+          <li>Certifikatë trajnimi bazik</li>
+          <li>Hap drejt lejes së armëmbajtjes</li>
+        </ul>
+      </div>
+      <div class="price-card">
+        <h3>Anëtarësim Vjetor</h3>
+        <div class="price mono">€450<span> / vit</span></div>
+        <ul>
+          <li>Hyrje e pakufizuar në korsi</li>
+          <li>Rezervim prioritar</li>
+          <li>Zbritje në municion &amp; qira armësh</li>
+          <li>Mbështetje e plotë për lejet</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== RREGULLAT / SAFETY ===== -->
+<section class="rules" id="rregullat">
+  <div class="container rules-grid">
+    <div class="rules-visual">
+      <svg viewBox="0 0 300 360" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0.5" y="0.5" width="299" height="359" fill="none" stroke="var(--line-strong)"/>
+        <circle cx="150" cy="120" r="70" fill="none" stroke="var(--line-strong)"/>
+        <circle cx="150" cy="120" r="45" fill="none" stroke="var(--rust)" stroke-dasharray="3 5"/>
+        <circle cx="150" cy="120" r="20" fill="none" stroke="var(--line-strong)"/>
+        <circle cx="150" cy="120" r="3" fill="var(--rust)"/>
+        <line x1="150" y1="20" x2="150" y2="220" stroke="var(--cream)" stroke-opacity="0.3"/>
+        <line x1="50" y1="120" x2="250" y2="120" stroke="var(--cream)" stroke-opacity="0.3"/>
+        <text x="150" y="270" fill="var(--bone)" font-family="Oswald" font-size="20" letter-spacing="3" text-anchor="middle" text-transform="uppercase">SIGURIA SË PARI</text>
+        <text x="150" y="300" fill="var(--sage)" font-family="Space Mono" font-size="11" letter-spacing="2" text-anchor="middle">PPE OBLIGATIVE NË ÇDO KORSI</text>
+      </svg>
+    </div>
+    <div>
+      <span class="section-tag">Protokolli i poligonit</span>
+      <h2 style="font-size:clamp(28px,4.5vw,40px); margin-bottom:32px;">Rregulla të qarta për një ambient të sigurt.</h2>
+      <div class="rules-list">
+        <div class="rule-item">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6z"/></svg></div>
+          <div><h4>Mbrojtje syri &amp; veshi</h4><p>Detyrueshme për të gjithë në çdo korsi, pa përjashtim.</p></div>
+        </div>
+        <div class="rule-item">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M3 12h18M12 3v18"/></svg></div>
+          <div><h4>Drejtimi i tytës</h4><p>Arma drejtohet vetëm kah objektivi, edhe kur nuk qitet.</p></div>
+        </div>
+        <div class="rule-item">
+          <div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+          <div><h4>Komandat e instruktorit</h4><p>Çdo korsi mbikëqyret; ndalo menjëherë kur thirret &ldquo;STOP&rdquo;.</p></div>
+        </div>
+        <div class="rule-item">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+          <div><h4>Verifikim përpara hyrjes</h4><p>Çdo armë kontrollohet dhe regjistrohet para se të kalohet në korsi.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA BAND ===== -->
+<section class="cta-band">
+  <div class="container">
+    <h2>Gati për korsinë?</h2>
+    <p>Rezervo seancën tënde ose na shkruaj për procesin e licencës — ekipi ynë përgjigjet brenda ditës.</p>
+    <div class="hero-actions">
+      <a href="#kontakt" class="btn btn-primary">Rezervo Tani</a>
+      <a href="tel:+38500000000" class="btn btn-outline">Na telefono</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== KONTAKT ===== -->
+<section class="section" id="kontakt">
+  <div class="container contact-grid">
+    <div class="contact-info">
+      <span class="section-tag">Na gjeni</span>
+      <h2>Hajde në Poligoni Apache.</h2>
+      <p>Jemi të hapur çdo ditë të javës. Për grupe, ngjarje korporative ose trajnime private, na kontakto paraprakisht për rezervim të dedikuar.</p>
+      <div class="contact-rows">
+        <div class="contact-row"><div class="k">Lokacioni</div><div class="v"><a href="https://maps.google.com/?q=42.526093,21.118259" target="_blank" rel="noopener" style="text-decoration:none; color:inherit; border-bottom:1px solid var(--rust);">42.526093, 21.118259</a></div></div>
+        <div class="contact-row"><div class="k">Telefon</div><div class="v">+383 48 444 752 +383 45 667 132</div></div>
+        <div class="contact-row"><div class="k">Email</div><div class="v">poligoniapache@gmail.com</div></div>
+        <div class="contact-row"><div class="k">Orari</div><div class="v">E Hënë – E Premte · 09:00–21:00</div></div>
+      </div>
+
+      <div class="map-frame">
+        <iframe
+          src="https://maps.google.com/maps?q=42.526093,21.118259&z=14&output=embed"
+          width="100%" height="280" style="border:0;" loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Lokacioni i Poligoni Apache">
+        </iframe>
+        <a href="https://maps.google.com/?q=42.526093,21.118259" target="_blank" rel="noopener" class="map-link">Hap në Google Maps &rarr;</a>
+      </div>
+    </div>
+
+    <div class="contact-form">
+      <h3>Kërko Informacion / Rezervim</h3>
+      <div class="sub">Plotëso formularin më poshtë</div>
+      <form onsubmit="event.preventDefault(); this.querySelector('.btn-primary').textContent='Dërguar ✓';">
+        <div class="field-row">
+          <div class="field">
+            <label for="emri">Emri</label>
+            <input type="text" id="emri" name="emri" placeholder="Emri Mbiemri" required>
+          </div>
+          <div class="field">
+            <label for="tel">Telefon</label>
+            <input type="tel" id="tel" name="tel" placeholder="+383 ..." required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="interesi">Interesimi</label>
+          <select id="interesi" name="interesi">
+            <option>Seancë qitjeje — Pistoletë</option>
+            <option>Seancë qitjeje — Karabinë</option>
+            <option>Seancë qitjeje — Snajper</option>
+            <option>Pako Trajnimi</option>
+            <option>Shërbimi i Lejeve të Armëmbajtjes</option>
+            <option>Anëtarësim Vjetor</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="mesazhi">Mesazhi (opsional)</label>
+          <textarea id="mesazhi" name="mesazhi" rows="3" placeholder="Shkruaj kërkesën tënde..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; border:none; cursor:pointer;">Dërgo Kërkesën</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/7QCEUGhvdG9zaG9wIDMuMAA4QklNBAQAAAAAAGgcAigAYkZCTUQwYTAwMGFkYTAxMDAwMDIxMDMwMDAwYmQwNDAwMDBjOTA0MDAwMGQ1MDQwMDAwMGUwODAwMDA0YTBjMDAwMGEzMGMwMDAwYjgwYzAwMDBjNDBjMDAwMDNjMTEwMDAwAP/bAIQABQYGCwgLCwsLCw0LCwsNDg4NDQ4ODw0ODg4NDxAQEBEREBAQEA8TEhMPEBETFBQTERMWFhYTFhUVFhkWGRYWEgEFBQUKBwoICQkICwgKCAsKCgkJCgoMCQoJCgkMDQsKCwsKCw0MCwsICwsMDAwNDQwMDQoLCg0MDQ0MExQTExOc/8IAEQgAlgCWAwEiAAIRAQMRAf/EAKUAAQACAwEBAQAAAAAAAAAAAAAGBwEEBQMCCBAAAgIBAwQBAgcAAAAAAAAAAgMBBAAFERIQExQgYCEwFSMkMTNAUBEAAQIDBAQKCAYDAAAAAAAAAQIRAAMhEjFBUSJhcZEQIDAygaGxwdHhEzNAQlJikvAEI1BygvFTYOISAQABAwMDAwUBAAMAAAAAAAERACExQVFhcYGRobHwECAwwdHhUGDx/9oADAMBAAIAAwAAAAGuh5/IAAAAAAACxa6sUroAADPcnRV/zdvLZqLF0R8rdIY8wAAsWurFK6APo95b1/Vnma0t3SE/No+xTu5aXEID2/n1K41rVqtjAFi11YpXQEijtrMzT18/pnSbnocHmyKlGLi+s77PM39nBrU/dEOYqIMLFrqxSugZvOlLwZ62NX3ZzyuvAyvp75xBjt2lEdIsM+Gc8f49CiGcPlYtdWKV0D1uyk5ozZPKkH2zCO9xouT/ANNfrnF8ePxyQ93e2zyjUpgbFWhhYtdWKV0B7eI/QWa0s5nZ5kH6xuanf3mdHf0eCTNWtkGrQUniLAMLFrqxSugAJNGRPPuDTVnx0pnxxFpXzDtcaI+QDACxa6sUroAAAAAAAACxa6sUrpYorpYorpYorpYorpYorpYorpYorpYorpYorqxQ/9oACAEBAAEFAv8AOlZRghJf0K1I34iiFXHvVAE1CsUyu6G1VPxuntXH2lrJkqrLRli1upW84LYZUZvGSU+NW2FydQIRsVAbLVEsveI3zTKnHNSqzlVK2169EUyKxHoQwUHSEgml2WaeiWlqlaWZMbe9GCgh/bOZRnext5as/E1EY2V55as81WAcFhwJ5qVftM9tNXusR4xn16G8ByUkzE8NuMdds1JMs96Q7L6+crH7SVZoSunW7b+4PpbGCH1Vtya/twpwsjffJyxLIrXkdxdfuERzulf8WbYy4IzaOACfXl9KBc0mkSwjarFWTCFWBdkqKXRTXBiuRZ5oRi7DNxUZ4IwOakX5frH7aZaLlEdLqgXETGJuAWGwQizZhuDIzK0ivptmpvlfuByEpPuAwN+njxlytzw6M7+NHDhG/RzOAmyTn30qxMEQ75cvyyV3+2oLSzGGDMeWviWo7lpzy7kTvmp2u6f2at+VRNQHrJBMfbXCIEv0y+zutMsBtQZx+ofT7YHIZT1Mhl1mt3EPrbrt1UzY1LnknM/AP//aAAgBAwABPwH5J//aAAgBAgABPwH5J//aAAgBAQEGPwL9OqkjohgHOr2ClGzj0kxVRuBhM1Wkl9FtcIUJelMDpsjSrCl2U6POtAUj8lUtwbs+iHKXGqrcnZSHMPO01m6Wmu+EGWLEq0ygKHZuifId3TaRjdUdUFD6SKtqtecfhFlwkJFWdmMLJABMwAsLN1a9MFXuyJe9g3WXhdrTciyk674SAyJhTzcensgpUGI5BhFpQZqbX8o9NLoU3t29EBLGyq/O1DuVFmc4DKNFIGwNwMagwpAZAV8IgzVVlyw6QMWoBB/ETLzzfHwhJSCo9gavIWgl62RtPD6vcR5RVKx/HweKk7vFoYKYNziGEetR9Qj1qPqEc8HY57opc1MOqLJrmIoGSqo7+OLm0v3Vo+q6ABhxNJSdhIwhcwJISSSKQGsOwdmyi4buIOaAApTnMYcdNGons8+JzxCiFBQJLXvfsgSnNE1vZydmcOWCUk47o5w4lcdH6g3GS9z1gEJK04lOEOkv3cICki0VNht7olKSlIUpnYNzhCZY+k0HTC5ipKLQBTni0SSJItWmdvhpXbw2UgzF5J7zFo4XfuanGbW8IOpj/GndD3K+IUMVZafibtbtaHJEwdfRh1xShBuN+6LR9WkBh81e6PSBOlEy16lQet1omsWUC7YEwfeJuS1R0f1H5p/gmg6TeYYAAaoOOr738Y184Ev3at28IVYxq1KeOUUBKfdNyn1NX7uhi6D83jDqLCKJJAzuPR47oYhRWTUXU1NjGiG8uEpBotLNlWp6RTjhQvF0JXdaDxziKYeHAhqBCrQ+8ocVUWA+8s4l+8GZVbv+YEt6Ag7i8WmqceEmgyekWlVJx5D0ZOip7y1dW2OcR95wUyiyU1UvZ574lqm6Slvde2cW7TAUL0YxaCg2b0hSgsKCb2rCEpoJg0VnA3Cm2+FIUHWTpqKsE6opWLHuyyek8lYULcs4Q8gMoHSBOeD3QlFUJlp0S3w4/VCZVp7araz1eMTUj/Kncf6hAZVudLCflqG7oUzlaCKajQ9cCdONmjLSCKquv2XwEStFIDUoOjG7lHSSNkBMw6OeUIVRSviyyhSbBAXzrStGlY0ZZfO/c5hkWkB6swfdFS/+gf/aAAgBAQIBPyH/AI0JxemQSQQUKOLUnK2hL4pIs5/PLWjJsySWzffGtRJ7F8KmxvtidqAhIKEoyBJj/KudxC6Lb31mM3qAkLFKiL5z19aCEl9BIMEIvnWCpnNTUTqZjZJ/GbW+h8xQR1RsasP7HWkW5DOGGSYnUN6JIzfl0Ip3Z4q/cXPEw0EABkqTYjPGtWKR5w6EUuHrkx6lLR9v6E3LDWIscxSBFWS3qtxZjcTrO+omX9Nx0fwOwFXAZaRLEHLKGpaCxN80Fgjly6GzhnjpR4C56hnW5ZxFaWuw9EFWkHg9n0UAZAkj1oq4ZYhkxM5KjMC3BREHW64q/Wqn07At5VegMARAJHdvd4KRI2TP3kRO5Yg49bZjSaIAGY1IJdW1rtNYcoN/6NTPhbn1qjszZT4koEkAwDVL+MZ1p0snonN6TzQS46R7Cog2jZhcyhMbVIGFjUtkna+KB7Ri0Nh0ff75zAyZk3gmxB0orKBAbBimdI7/AD9VlePWfpasBchqzzajR4HCFxJa20dKTOSzS36K/wDOfyi1NAO9GidV5GZaCeofcE1xQjFyLJ1V3+nyP9qIu5/VQoXknxftRTsWwUlnlQwts5BgRF8y080wJeWF7IIzeZ6UJ/Q+o0FMW8JYdhh7fdoG1dMBuxeCuOkliBFto9KgWGu/BMjw1oGj8/2pQxmGOulMgTAiQFFhSerFStpEUmwEXSaaThbvUJaTk35oSYMLYJsxJD3pjlyCfNAnU31Ppd/K7xwo9Aq3kkJblyPmlKu/2liyNjcj4VbGHuHL4FKWfJZ17zSeJvCL2piNkN6Vyza8Q8k8eBUuM0Skf0eKFZC7VIaQu9qZQFfNpvLG7N6t2YEhmJTrbpilrLkgjuVk5mxdo4rpxPoN4vDrRcwjwnc8CFG8NCKiLlOWkEmYFk8fcrEAYY3GPdo82UQWs3XK0BjW/X6HaAbFYrMWk2T7UrPpkDAyV3TbKoTEQNX9dYqNHk16b00XY2bU4dJd1CSAgAkidRhMYx0qWhlApl5OtBFIc0SJZiA2pHOgPvYmHFclR1YEOXPOZpJIuzJ1zoWKQbJI6Ui3IAMDCRfF2mtXxi5Fkg3mGFwjuUC1GCUS41u0L0pMYAHDjbTpQbAih1QafW9qQ3ITHzE02Ryll/BGpeGBHV7O9PCwMwhPWjAwwHPDiwN3FKMUwiELBDD6TNPAFyX9pnDT9E5AhHOKYSDM8wxgvREJvcMyYWMSalhfYqCiBWkdtKAigOEuNMgIAPAv6PxLoUibgdl04rKlCS2EHRHe9WeyNkSybM0n1YrNBhYnlUuEE8v8UdnqQHb5mZPN6ILLhKSWDRItXCcRKO7PWECWs07SDOdTRK8x+RaS4lRZqcHaTuknMXdCaFk8sW2LnRDbJtTo12QZIZZL4pGxUh+5YPFIDKkyjiHqrWZIWJvGtv8AoH//2gAMAwEBAgADAgAAEAQQQQQQQQQQQQRfDBQQQQRSEdfQZQQQRNKJfBOQQQVPJNLTLCQQXCHoIsFQQQQVRSPMCAQQQUWBLKIQQQQQQQQQQQQQQQQQQQQQQf/aAAgBAwEBPxDlWhob2AckPaj+g//aAAgBAgABPxD5J//aAAgBAQIBPxD/AI1EAU4Alexes/Yw0IRLOlWiYsyIzZdpGhAURsiMJHW351Is8ZYEz4RoZUfrL5gDVZzdQjWk9GCUdbtMPjM7CepUyVYa/i3Q1lSzFjViKKNQWyrDmdk3j8eEQu0ZVbA1VirIcnDnD/Hh40yukNiuFOqJv5VUOfdiqgudAwJnxKN7FcRsUX7PGitRHhuZr2vVA95J3wl5h0EQJs0TRPwASg8AlNgqUwQwkomunV9pXjEZrIM2t1QH3yYtnhNFgqOSZ70SQeu2KJ4G9iFSz15ol8QcDg0ox7xDOV0rcUXHdNK12VFwBQ+PwaKw61m0GNoEl9yKABRAciaffDPBmBbp3dDNRmSIiAtDcVi00JEzM23ogSggt4Yj0dRMInK3jWDmaMXEA/3Gk04wtOubzUnHRPwLQXU4Al9MV+/J7L9ExyKcPEF4QULcTaijVWilJHCGWdKxuMsmDaGE2+8+WZcsDFoHeKGBHGvgCW7beoW7pkLGblB0EvEdjNsZt9CEZ6IABn7lEArGU+iaHRSIQqFcGktFulq6r2u3qYgupXV6uem2lEfUxvAi+eg+5LAlhfFZW4QKxtF2d1E6+mKJWcEaCzv2UDZhvtkltLc0q4QMyWGS2swMLpUG8OZLYKOE18gFPKBHFFvq9GA0TdTDf1mD1tSTx/n0lwW30ZvbfrSheRmH9lpG/wBuhF2yC9jqGNKHGw7zgsmlA/JaPAhrBUGpoLvF0H07ikFvNxi39oooi6sESR7RMRHgLory4OaY6Z9ytT+XsR0Ll7asHpY7Ly+fofRSu22a8tbvuh59TNvNTOXCm2S57aVjKV6rP2poVXSuD7QUK4GRN8460L/tJYuow4Ip5YXx3BdPQVfXh6u/CoKM2ELGt0xL8XWjs6z9xPsVN4crr6v4g4qzGv8AYqhPqV0dtoFS82LjNWmbYifBqVwPmy4U5d+40YMcAPgL9aOwAts3ijAjHf7myrTzJsgcZFD2pNYbZBKxqPAcUTySW6nV+m5nDi8AB+4VtmIlYySFRbuOFLfCq5BMvAEq6DUclm9n37D/AOASfNuwLXBgOVLgsEI86llnNBYeqvq3rAp4ceMVfCWeDaZ5F9/DqlMHbR4o7lFIR1U2WvWixwhYyjV0A1M0KgBdEiOiNb8UlYRqNHJSqWdPFtwA6O1LYAsiNMrs6Q2LdHeXqNBuyQOBLQ6Z1+oQWSDuyXuthYCYsNZmKRV0noQAQQY/AvgS7BYes7F8lwP/AKTLEa96kqc0XyP9wO+HZt5IgMYoZmkRC0eZPepQLynUTOEVvwUpruY5xWNP5/8Api0UOokjQI0whygA6iWaFizpltJ2iEPxSGYV8S5Mv1dtorRxGI1VqQfq3tvVvrS3uEa80LC2/Eo1Cbecaphdnn0j6NK169mNQJCpjlDHfNj1BM34pZu3XK3fx2aCyCQhGMiViOz8QBCka0+TnuSX1jmUFM0OITUDp1L2+y+5jbG7FX9r2ihhbtBF2hc2ZldiXLrLP/QP/9k=" alt="Poligoni Apache">
+      <div class="footer-brand-text">Poligoni Apache<span>Fushë qitje &amp; trajnim</span></div>
+    </div>
+    <ul class="footer-links">
+      <li><a href="#armet">Armët</a></li>
+      <li><a href="#leje">Lejet</a></li>
+      <li><a href="#rregullat">Rregullat</a></li>
+      <li><a href="#kontakt">Kontakt</a></li>
+    </ul>
+    <div class="legal">© 2026 POLIGONI APACHE — TË GJITHA TË DREJTAT TË REZERVUARA</div>
+  </div>
+</footer>
+
+</body>
+</html>
